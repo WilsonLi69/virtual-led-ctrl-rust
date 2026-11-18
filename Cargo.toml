@@ -1,6 +1,30 @@
 [package]
 name = "virtual-led-ctrl-rust"
 version = "0.1.0"
-edition = "2024"
+# Kept at edition 2021 / rustc 1.84 so the crate builds with the rust 1.84.1
+# toolchain shipped by the OpenBMC Yocto layers (walnascar).
+edition = "2021"
+rust-version = "1.84"
+description = "Virtual LED controller for OpenBMC, written in Rust"
+license = "MIT"
+
+[lib]
+name = "virtual_led_ctrl_rust"
+path = "src/lib.rs"
+
+[[bin]]
+# Kept identical to the C++ daemon so existing systemd units and recipes
+# referring to /usr/bin/virtual-led-ctrl keep working.
+name = "virtual-led-ctrl"
+path = "src/main.rs"
 
 [dependencies]
+anyhow = "1"
+gpiocdev = "0.8"
+tokio = { version = "1", features = ["macros", "rt", "sync", "time"] }
+# zbus 6 requires rustc 1.89 and edition 2024; 5.12 is the newest release that
+# works with rustc 1.84 (MSRV 1.77).
+zbus = { version = "5.12", default-features = false, features = ["tokio"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt", "test-util", "time"] }
